@@ -10,7 +10,7 @@ import (
 type Torrent struct {
 	Hash           string `xmlrpc:"d.hash=" json:"hash"`
 	Name           string `xmlrpc:"d.name=" json:"name"`
-	Size           int64  `xmlrpc:"d.size_bytes=" json:"size_bytes"`
+	SizeBytes      int64  `xmlrpc:"d.size_bytes=" json:"size_bytes"`
 	CompletedBytes int64  `xmlrpc:"d.completed_bytes=" json:"completed_bytes"`
 	UploadRate     int64  `xmlrpc:"d.up.rate=" json:"upload_rate"`
 	UploadTotal    int64  `xmlrpc:"d.up.total=" json:"upload_total"`
@@ -62,8 +62,8 @@ func NewRtorrent(config RtorrentConfig) (*Rtorrent, error) {
 }
 
 // Lists available XMLRPC methods
-func (rt *Rtorrent) ListMethods() (interface{}, error) {
-	var result interface{}
+func (rt *Rtorrent) ListMethods() ([]string, error) {
+	var result []string
 	err := rt.client.Call("system.listMethods", nil, &result)
 	if err != nil {
 		return nil, err

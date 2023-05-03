@@ -33,7 +33,10 @@ func main() {
 	defer rtorrent.client.Close()
 
 	r := mux.NewRouter()
+	r.HandleFunc("/", TemplateViewHandler(rtorrent))
+
 	s := r.PathPrefix("/api").Subrouter()
+	s.HandleFunc("/methods", MethodsHandler(rtorrent))
 	s.HandleFunc("/view/{view}", ViewHandler(rtorrent))
 	s.HandleFunc("/torrent/{hash}/{action}", TorrentHandler(rtorrent))
 

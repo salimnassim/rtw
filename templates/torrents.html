@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>rtw</title>
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 0.8rem;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      table td,
+      table th {
+        text-align: left;
+        border: 1px solid #ddd;
+        padding: 2px;
+      }
+      table tr:nth-child(even) {
+        background-color: #f2f2f2;
+      }
+
+      table tr:hover {
+        background-color: #ddd;
+      }
+      .hash {
+        font-size: 0.6rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>SizeBytes</th>
+            <th>CompletedBytes</th>
+            <th>UR</th>
+            <th>DR</th>
+            <th>UT</th>
+            <th>DT</th>
+            <th>Seeders</th>
+            <th>Leechers</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range .}}
+          <tr>
+            <td>{{ .Name }} <br /><span class="hash">{{ .Hash }}</span></td>
+            <td>{{ .SizeBytes }}</td>
+            <td>{{ .CompletedBytes }}</td>
+            <td>{{ .UploadRate }}</td>
+            <td>{{ .DownloadRate }}</td>
+            <td>{{ .UploadTotal }}</td>
+            <td>{{ .DownloadTotal }}</td>
+            <td>{{ .Seeders }}</td>
+            <td>{{ .Leechers }}</td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+    </main>
+  </body>
+</html>

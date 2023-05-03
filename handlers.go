@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"html/template"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -10,17 +10,22 @@ import (
 
 type Response struct {
 	Status  string `json:"status"`
-	Message string `json:"message,omitempty"`
+	Message string `json:"message"`
+}
+
+type MethodsResponse struct {
+	Status  string   `json:"status"`
+	Methods []string `json:"methods"`
 }
 
 type ViewResponse struct {
 	Status   string    `json:"status"`
-	Torrents []Torrent `json:"torrents,omitempty"`
+	Torrents []Torrent `json:"torrents"`
 }
 
 type TorrentResponse struct {
 	Status string `json:"status"`
-	Files  []File `json:"files,omitempty"`
+	Files  []File `json:"files"`
 }
 
 func respond(p interface{}, statusCode int, w http.ResponseWriter) {
@@ -33,6 +38,41 @@ func respond(p interface{}, statusCode int, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	w.Write(bytes)
+}
+
+func TemplateViewHandler(rt *Rtorrent) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		args := []interface{}{"", "main", "d.hash=", "d.name=",
+			"d.size_bytes=", "d.completed_bytes=", "d.up.rate=",
+			"d.up.total=", "d.down.rate=", "d.down.total=",
+			"d.message=", "d.is_active=", "d.is_open="}
+
+		torrents, err := rt.DMulticall("main", args)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		tpl := template.Must(template.ParseFiles("templates/torrents.html"))
+		tpl.Execute(w, torrents)
+	}
+}
+
+func MethodsHandler(rt *Rtorrent) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		result, err := rt.ListMethods()
+		if err != nil {
+			respond(Response{
+				Status:  "error",
+				Message: err.Error(),
+			}, http.StatusInternalServerError, w)
+			return
+		}
+		respond(MethodsResponse{
+			Status:  "ok",
+			Methods: result,
+		}, http.StatusOK, w)
+	}
 }
 
 func ViewHandler(rt *Rtorrent) http.HandlerFunc {
@@ -69,7 +109,7 @@ func TorrentHandler(rt *Rtorrent) http.HandlerFunc {
 			if err != nil {
 				respond(Response{
 					Status:  "error",
-					Message: fmt.Sprintf("unable to stop torrent: %v", err),
+					Message: err.Error(),
 				}, http.StatusInternalServerError, w)
 				return
 			}
@@ -84,7 +124,7 @@ func TorrentHandler(rt *Rtorrent) http.HandlerFunc {
 			if err != nil {
 				respond(Response{
 					Status:  "error",
-					Message: fmt.Sprintf("unable to start torrent: %v", err),
+					Message: err.Error(),
 				}, http.StatusBadRequest, w)
 				return
 			}
