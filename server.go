@@ -35,6 +35,7 @@ func main() {
 	r := mux.NewRouter()
 	s := r.PathPrefix("/api").Subrouter()
 	s.HandleFunc("/view/{view}", ViewHandler(rtorrent))
+	s.HandleFunc("/torrent/{hash}/{action}", TorrentHandler(rtorrent))
 
 	srv := &http.Server{
 		ReadHeaderTimeout: 10 * time.Second,

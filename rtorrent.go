@@ -29,6 +29,16 @@ type Torrent struct {
 	Custom5        string `xmlrpc:"d.custom5=" json:"custom5"`
 }
 
+type File struct {
+	Path            string `xmlrpc:"f.path=" json:"path"`
+	SizeChunks      int64  `xmlrpc:"f.size_chunks=" json:"size_chunks"`
+	CompletedChunks int64  `xmlrpc:"f.completed_chunks=" json:"completed_chunks"`
+	FrozenPath      string `xmlrpc:"f.frozen_path=" json:"frozen_path"`
+	Priority        int64  `xmlrpc:"f.priority=" json:"priority"`
+	IsCreated       int64  `xmlrpc:"f.is_created=" json:"is_created"`
+	IsOpen          int64  `xmlrpc:"f.is_open=" json:"is_open"`
+}
+
 type RtorrentConfig struct {
 	URL       string
 	Transport http.RoundTripper
@@ -38,6 +48,7 @@ type Rtorrent struct {
 	client *xmlrpc.Client
 }
 
+// Creates a new instance of Rtorrent client
 func NewRtorrent(config RtorrentConfig) (*Rtorrent, error) {
 	xmlrpcClient, err := xmlrpc.NewClient(config.URL, config.Transport)
 	if err != nil {
@@ -50,6 +61,7 @@ func NewRtorrent(config RtorrentConfig) (*Rtorrent, error) {
 	return rtorrent, nil
 }
 
+// Lists available XMLRPC methods
 func (rt *Rtorrent) ListMethods() (interface{}, error) {
 	var result interface{}
 	err := rt.client.Call("system.listMethods", nil, &result)
@@ -57,6 +69,24 @@ func (rt *Rtorrent) ListMethods() (interface{}, error) {
 		return nil, err
 	}
 	return result, nil
+}
+
+// Stop torrent with the specified hash
+func (rt *Rtorrent) Stop(hash string) error {
+	err := rt.client.Call("d.stop", hash, nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Start torrent with the specified hash
+func (rt *Rtorrent) Start(hash string) error {
+	err := rt.client.Call("d.start", hash, nil)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (rt *Rtorrent) DMulticall(view string, args interface{}) ([]Torrent, error) {
@@ -89,4 +119,37 @@ func (rt *Rtorrent) DMulticall(view string, args interface{}) ([]Torrent, error)
 	}
 
 	return torrents, nil
+}
+
+func (rt *Rtorrent) FMulticall(args interface{}) ([]File, error) {
+	var result interface{}
+	err := rt.client.Call("f.multicall", args, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	// todo: deduplicate
+	files := make([]File, 0)
+	for _, outer := range result.([]interface{}) {
+		file := &File{}
+		for idx := 2; idx < len(args.([]interface{})); idx++ {
+			ref := outer.([]interface{})[idx-2]
+			fname := args.([]interface{})[idx].(string)
+			vo := reflect.ValueOf(file)
+			el := vo.Elem()
+			for i := 0; i < el.NumField(); i++ {
+				field := el.Type().Field(i)
+				if fname == field.Tag.Get("xmlrpc") {
+					if ref == nil {
+						continue
+					}
+					el.Field(i).Set(reflect.ValueOf(ref))
+				}
+			}
+
+		}
+		files = append(files, *file)
+	}
+
+	return files, nil
 }
