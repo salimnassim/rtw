@@ -42,12 +42,15 @@
             <th>Name</th>
             <th>SizeBytes</th>
             <th>CompletedBytes</th>
-            <th>UR</th>
-            <th>DR</th>
-            <th>UT</th>
-            <th>DT</th>
+            <th>UploadRate</th>
+            <th>DownloadRate</th>
+            <th>UploadTotal</th>
+            <th>DownloadTotal</th>
             <th>Seeders</th>
             <th>Leechers</th>
+            <th>IsActive</th>
+            <th>IsOpen</th>
+            <th>IsHashing</th>
           </tr>
         </thead>
         <tbody>
@@ -62,6 +65,9 @@
             <td>{{ .DownloadTotal }}</td>
             <td>{{ .Seeders }}</td>
             <td>{{ .Leechers }}</td>
+            <td>{{ .IsActive }}</td>
+            <td>{{ .IsOpen }}</td>
+            <td>{{ .IsHashing }}</td>
           </tr>
           {{end}}
         </tbody>
