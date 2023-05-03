@@ -26,8 +26,10 @@ func main() {
 		URL:       os.Getenv("URL"),
 		Transport: transport,
 	})
+
 	if err != nil {
 		log.Fatalf("unable to create rtorrent instance: %v", err)
+		return
 	}
 
 	defer rtorrent.client.Close()
@@ -39,6 +41,7 @@ func main() {
 	s.HandleFunc("/methods", MethodsHandler(rtorrent))
 	s.HandleFunc("/view/{view}", ViewHandler(rtorrent))
 	s.HandleFunc("/torrent/{hash}/{action}", TorrentHandler(rtorrent))
+	s.Use(CorsMiddleware)
 
 	srv := &http.Server{
 		ReadHeaderTimeout: 10 * time.Second,
@@ -48,9 +51,10 @@ func main() {
 		Handler:           r,
 	}
 
+	log.Printf("listening http://%s", os.Getenv("BIND_ADDRESS"))
 	err = srv.ListenAndServe()
 	if err != nil {
-		log.Fatalf("unable start http server: %s", err)
+		log.Fatalf("server failure: %s", err)
 	}
 
 }
