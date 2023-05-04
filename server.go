@@ -38,6 +38,7 @@ func main() {
 	r.HandleFunc("/", TemplateViewHandler(rtorrent))
 
 	s := r.PathPrefix("/api").Subrouter()
+	s.HandleFunc("/load", LoadHandler(rtorrent)).Methods("POST")
 	s.HandleFunc("/methods", MethodsHandler(rtorrent))
 	s.HandleFunc("/view/{view}", ViewHandler(rtorrent))
 	s.HandleFunc("/torrent/{hash}/{action}", TorrentHandler(rtorrent))
@@ -51,7 +52,7 @@ func main() {
 		Handler:           r,
 	}
 
-	log.Printf("listening http://%s", os.Getenv("BIND_ADDRESS"))
+	log.Printf("listen address: http://%s", os.Getenv("BIND_ADDRESS"))
 	err = srv.ListenAndServe()
 	if err != nil {
 		log.Fatalf("server failure: %s", err)

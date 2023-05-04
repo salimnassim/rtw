@@ -71,6 +71,15 @@ func (rt *Rtorrent) ListMethods() ([]string, error) {
 	return result, nil
 }
 
+// Load and start a torrent
+func (rt *Rtorrent) LoadRawStart(base64 string) error {
+	err := rt.client.Call("load.raw_start", []interface{}{"", base64}, nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // Stop torrent with the specified hash
 func (rt *Rtorrent) Stop(hash string) error {
 	err := rt.client.Call("d.stop", hash, nil)

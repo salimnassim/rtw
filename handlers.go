@@ -5,6 +5,8 @@ import (
 	"html/template"
 	"net/http"
 
+	b64 "encoding/base64"
+
 	"github.com/gorilla/mux"
 )
 
@@ -71,6 +73,45 @@ func MethodsHandler(rt *Rtorrent) http.HandlerFunc {
 		respond(MethodsResponse{
 			Status:  "ok",
 			Methods: result,
+		}, http.StatusOK, w)
+	}
+}
+
+func LoadHandler(rt *Rtorrent) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		r.ParseMultipartForm(10 << 20)
+
+		file, _, err := r.FormFile("file")
+		if err != nil {
+			respond(Response{
+				Status:  "error",
+				Message: err.Error(),
+			}, http.StatusBadRequest, w)
+			return
+		}
+		defer file.Close()
+
+		bytes := make([]byte, 0)
+		_, err = file.Read(bytes)
+		if err != nil {
+			respond(Response{
+				Status:  "error",
+				Message: err.Error(),
+			}, http.StatusBadRequest, w)
+			return
+		}
+
+		base64 := b64.StdEncoding.EncodeToString(bytes)
+		err = rt.LoadRawStart(base64)
+		if err != nil {
+			respond(Response{
+				Status:  "error",
+				Message: err.Error(),
+			}, http.StatusInternalServerError, w)
+			return
+		}
+		respond(Response{
+			Status: "ok",
 		}, http.StatusOK, w)
 	}
 }
