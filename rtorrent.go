@@ -109,28 +109,7 @@ func (rt *Rtorrent) DMulticall(view string, args interface{}) ([]Torrent, error)
 		return nil, err
 	}
 
-	torrents := make([]Torrent, 0)
-	for _, outer := range result.([]interface{}) {
-		torrent := &Torrent{}
-		for idx := 2; idx < len(args.([]interface{})); idx++ {
-			ref := outer.([]interface{})[idx-2]
-			fname := args.([]interface{})[idx].(string)
-			vo := reflect.ValueOf(torrent)
-			el := vo.Elem()
-			for i := 0; i < el.NumField(); i++ {
-				field := el.Type().Field(i)
-				if fname == field.Tag.Get("xmlrpc") {
-					if ref == nil {
-						continue
-					}
-					el.Field(i).Set(reflect.ValueOf(ref))
-				}
-			}
-
-		}
-		torrents = append(torrents, *torrent)
-	}
-
+	torrents := multicallTags[Torrent](result, args)
 	return torrents, nil
 }
 
@@ -141,14 +120,19 @@ func (rt *Rtorrent) FMulticall(args interface{}) ([]File, error) {
 		return nil, err
 	}
 
-	// todo: deduplicate
-	files := make([]File, 0)
+	files := multicallTags[File](result, args)
+	return files, nil
+}
+
+// Maps XMLRPC result to a struct using fields from args with reflection
+func multicallTags[T File | Torrent](result interface{}, args interface{}) []T {
+	items := make([]T, 0)
 	for _, outer := range result.([]interface{}) {
-		file := &File{}
+		item := new(T)
 		for idx := 2; idx < len(args.([]interface{})); idx++ {
 			ref := outer.([]interface{})[idx-2]
 			fname := args.([]interface{})[idx].(string)
-			vo := reflect.ValueOf(file)
+			vo := reflect.ValueOf(item)
 			el := vo.Elem()
 			for i := 0; i < el.NumField(); i++ {
 				field := el.Type().Field(i)
@@ -161,8 +145,7 @@ func (rt *Rtorrent) FMulticall(args interface{}) ([]File, error) {
 			}
 
 		}
-		files = append(files, *file)
+		items = append(items, *item)
 	}
-
-	return files, nil
+	return items
 }
