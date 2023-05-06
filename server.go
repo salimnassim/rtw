@@ -38,6 +38,7 @@ func main() {
 	r.HandleFunc("/", TemplateViewHandler(rtorrent))
 
 	s := r.PathPrefix("/api").Subrouter()
+	s.HandleFunc("/hello", HelloHandler(rtorrent))
 	s.HandleFunc("/load", LoadHandler(rtorrent)).Methods("POST")
 	s.HandleFunc("/methods", MethodsHandler(rtorrent))
 	s.HandleFunc("/view/{view}", ViewHandler(rtorrent))

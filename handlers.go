@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"html/template"
+	"log"
 	"net/http"
 
 	b64 "encoding/base64"
@@ -47,7 +48,8 @@ func TemplateViewHandler(rt *Rtorrent) http.HandlerFunc {
 		args := []interface{}{"", "main", "d.hash=", "d.name=",
 			"d.size_bytes=", "d.completed_bytes=", "d.up.rate=",
 			"d.up.total=", "d.down.rate=", "d.down.total=",
-			"d.message=", "d.is_active=", "d.is_open="}
+			"d.message=", "d.is_active=", "d.is_open=",
+			"d.state=", "d.state_changed=", "d.state_counter="}
 
 		torrents, err := rt.DMulticall("main", args)
 		if err != nil {
@@ -57,6 +59,15 @@ func TemplateViewHandler(rt *Rtorrent) http.HandlerFunc {
 
 		tpl := template.Must(template.ParseFiles("templates/torrents.html"))
 		tpl.Execute(w, torrents)
+	}
+}
+
+func HelloHandler(rt *Rtorrent) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		respond(Response{
+			Status:  "ok",
+			Message: "🐢",
+		}, http.StatusOK, w)
 	}
 }
 
@@ -83,6 +94,7 @@ func LoadHandler(rt *Rtorrent) http.HandlerFunc {
 
 		file, _, err := r.FormFile("file")
 		if err != nil {
+			log.Printf("error in load handler reading form: %s", err)
 			respond(Response{
 				Status:  "error",
 				Message: err.Error(),
@@ -94,6 +106,7 @@ func LoadHandler(rt *Rtorrent) http.HandlerFunc {
 		bytes := make([]byte, 0)
 		_, err = file.Read(bytes)
 		if err != nil {
+			log.Printf("error in load handler loading bytes: %s", err)
 			respond(Response{
 				Status:  "error",
 				Message: err.Error(),
@@ -104,6 +117,7 @@ func LoadHandler(rt *Rtorrent) http.HandlerFunc {
 		base64 := b64.StdEncoding.EncodeToString(bytes)
 		err = rt.LoadRawStart(base64)
 		if err != nil {
+			log.Printf("error in load handler base64 encoding bytes: %s", err)
 			respond(Response{
 				Status:  "error",
 				Message: err.Error(),
@@ -123,10 +137,12 @@ func ViewHandler(rt *Rtorrent) http.HandlerFunc {
 		args := []interface{}{"", vars["view"], "d.hash=", "d.name=",
 			"d.size_bytes=", "d.completed_bytes=", "d.up.rate=",
 			"d.up.total=", "d.down.rate=", "d.down.total=",
-			"d.message=", "d.is_active=", "d.is_open="}
+			"d.message=", "d.is_active=", "d.is_open=",
+			"d.state=", "d.state_changed=", "d.state_counter="}
 
 		torrents, err := rt.DMulticall("main", args)
 		if err != nil {
+			log.Printf("error in view handler: %s", err)
 			respond(Response{
 				Status:  "error",
 				Message: err.Error(),
@@ -148,6 +164,7 @@ func TorrentHandler(rt *Rtorrent) http.HandlerFunc {
 		if vars["action"] == "stop" {
 			err := rt.Stop(vars["hash"])
 			if err != nil {
+				log.Printf("error in action stop handler: %s", err)
 				respond(Response{
 					Status:  "error",
 					Message: err.Error(),
@@ -163,6 +180,7 @@ func TorrentHandler(rt *Rtorrent) http.HandlerFunc {
 		if vars["action"] == "start" {
 			err := rt.Start(vars["hash"])
 			if err != nil {
+				log.Printf("error in action start handler: %s", err)
 				respond(Response{
 					Status:  "error",
 					Message: err.Error(),
@@ -176,12 +194,13 @@ func TorrentHandler(rt *Rtorrent) http.HandlerFunc {
 		}
 
 		if vars["action"] == "files" {
-			args := []interface{}{vars["hash"], "", "f.path=", "f.size_chunks=",
+			args := []interface{}{vars["hash"], "", "f.path=", "f.size_bytes=", "f.size_chunks=",
 				"f.completed_chunks=", "f.frozen_path=", "f.priority=",
 				"f.is_created=", "f.is_open="}
 
 			files, err := rt.FMulticall(args)
 			if err != nil {
+				log.Printf("error in action files handler: %s", err)
 				respond(Response{
 					Status:  "error",
 					Message: err.Error(),

@@ -22,6 +22,9 @@ type Torrent struct {
 	IsHashing      int64  `xmlrpc:"d.is_hash_checking=" json:"is_hashing"`
 	Leechers       int64  `xmlrpc:"d.peers_accounted=" json:"leechers"`
 	Seeders        int64  `xmlrpc:"d.peers_complete=" json:"seeders"`
+	State          int64  `xmlrpc:"d.state=" json:"state"`
+	StateChanged   int64  `xmlrpc:"d.state_changed=" json:"state_changed"`
+	StateCounter   int64  `xmlrpc:"d.state_counter=" json:"state_counter"`
 	Custom1        string `xmlrpc:"d.custom1=" json:"custom1"`
 	Custom2        string `xmlrpc:"d.custom2=" json:"custom2"`
 	Custom3        string `xmlrpc:"d.custom3=" json:"custom3"`
@@ -31,6 +34,7 @@ type Torrent struct {
 
 type File struct {
 	Path            string `xmlrpc:"f.path=" json:"path"`
+	Size            int64  `xmlrpc:"f.size_bytes=" json:"size"`
 	SizeChunks      int64  `xmlrpc:"f.size_chunks=" json:"size_chunks"`
 	CompletedChunks int64  `xmlrpc:"f.completed_chunks=" json:"completed_chunks"`
 	FrozenPath      string `xmlrpc:"f.frozen_path=" json:"frozen_path"`
