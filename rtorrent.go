@@ -43,6 +43,38 @@ type File struct {
 	IsOpen          int64  `xmlrpc:"f.is_open=" json:"is_open"`
 }
 
+type Peer struct {
+	PeerID           string `xmlrpc:"p.id=" json:"peer_id"`
+	Address          string `xmlrpc:"p.address=" json:"address"`
+	Port             int64  `xmlrpc:"p.port=" json:"port"`
+	Banned           int64  `xmlrpc:"p.banned=" json:"banned"`
+	ClientVersion    string `xmlrpc:"p.client_version=" json:"client_version"`
+	CompletedPercent int64  `xmlrpc:"p.completed_percent=" json:"completed_percent"`
+	IsEncrypted      int64  `xmlrpc:"p.is_encrypted=" json:"is_encrypted"`
+	IsIncoming       int64  `xmlrpc:"p.is_incoming=" json:"is_incoming"`
+	IsObfuscated     int64  `xmlrpc:"p.is_obfuscated=" json:"is_obfuscated"`
+	PeerRate         int64  `xmlrpc:"p.peer_rate=" json:"peer_rate"`
+	PeerTotal        int64  `xmlrpc:"p.peer_total=" json:"peer_total"`
+	UploadRate       int64  `xmlrpc:"p.up_rate=" json:"up_rate"`
+	UploadTotal      int64  `xmlrpc:"p.up_total=" json:"up_total"`
+}
+
+type Tracker struct {
+	TrackerID        string `xmlrpc:"t.id=" json:"tracker_id"`
+	ActivityTimeLast int64  `xmlrpc:"t.activity_time_last=" json:"activity_time_last"`
+	ActivityTimeNext int64  `xmlrpc:"t.activity_time_next=" json:"activity_time_next"`
+	CanScrape        int64  `xmlrpc:"t.can_scrape=" json:"can_scrape"`
+	IsUsable         int64  `xmlrpc:"t.is_usable=" json:"t.is_usable"`
+	IsEnabled        int64  `xmlrpc:"t.is_enabled=" json:"is_enabled"`
+	FailedCounter    int64  `xmlrpc:"t.failed_counter=" json:"failed_counter"`
+	FailedTimeLast   int64  `xmlrpc:"t.failed_time_last=" json:"failed_time_last"`
+	FailedTimeNext   int64  `xmlrpc:"t.failed_time_next=" json:"failed_time_next"`
+	IsBusy           int64  `xmlrpc:"t.is_busy=" json:"is_busy"`
+	IsOpen           int64  `xmlrpc:"t.is_open=" json:"is_open"`
+	Type             int64  `xmlrpc:"t.type=" json:"type"`
+	URL              string `xmlrpc:"t.url=" json:"url"`
+}
+
 type RtorrentConfig struct {
 	URL       string
 	Transport http.RoundTripper
@@ -124,8 +156,30 @@ func (rt *Rtorrent) FMulticall(args interface{}) ([]File, error) {
 	return files, nil
 }
 
+func (rt *Rtorrent) PMulticall(args interface{}) ([]Peer, error) {
+	var result interface{}
+	err := rt.client.Call("p.multicall", args, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	peers := multicallTags[Peer](result, args)
+	return peers, nil
+}
+
+func (rt *Rtorrent) TMulticall(args interface{}) ([]Tracker, error) {
+	var result interface{}
+	err := rt.client.Call("t.multicall", args, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	trackers := multicallTags[Tracker](result, args)
+	return trackers, nil
+}
+
 // Maps XMLRPC result to a struct using fields from args with reflection
-func multicallTags[T File | Torrent](result interface{}, args interface{}) []T {
+func multicallTags[T File | Torrent | Peer | Tracker](result interface{}, args interface{}) []T {
 	items := make([]T, 0)
 	for _, outer := range result.([]interface{}) {
 		item := new(T)
