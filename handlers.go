@@ -1,12 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
-
-	b64 "encoding/base64"
 
 	"github.com/gorilla/mux"
 )
@@ -113,8 +113,8 @@ func LoadHandler(rt *Rtorrent) http.HandlerFunc {
 		}
 		defer file.Close()
 
-		bytes := make([]byte, 0)
-		_, err = file.Read(bytes)
+		buffer := bytes.NewBuffer(nil)
+		_, err = io.Copy(buffer, file)
 		if err != nil {
 			log.Printf("error in load handler loading bytes: %s", err)
 			respond(Response{
@@ -124,10 +124,9 @@ func LoadHandler(rt *Rtorrent) http.HandlerFunc {
 			return
 		}
 
-		base64 := b64.StdEncoding.EncodeToString(bytes)
-		err = rt.LoadRawStart(base64)
+		_, err = rt.LoadRawStart(buffer.Bytes())
 		if err != nil {
-			log.Printf("error in load handler base64 encoding bytes: %s", err)
+			log.Printf("error in load handler: %s", err)
 			respond(Response{
 				Status:  "error",
 				Message: err.Error(),
