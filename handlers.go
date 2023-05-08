@@ -124,7 +124,7 @@ func LoadHandler(rt *Rtorrent) http.HandlerFunc {
 			return
 		}
 
-		_, err = rt.LoadRawStart(buffer.Bytes())
+		err = rt.LoadRawStart(buffer.Bytes())
 		if err != nil {
 			log.Printf("error in load handler: %s", err)
 			respond(Response{

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"net/http"
 	"reflect"
 
@@ -108,8 +109,10 @@ func (rt *Rtorrent) ListMethods() ([]string, error) {
 }
 
 // Load and start a torrent
-func (rt *Rtorrent) LoadRawStart(base64 string) error {
-	err := rt.client.Call("load.raw_start", []interface{}{"", base64}, nil)
+func (rt *Rtorrent) LoadRawStart(file []byte) error {
+	base64 := base64.StdEncoding.EncodeToString(file)
+
+	err := rt.client.Call("load.raw_start_verbose", []interface{}{"", xmlrpc.Base64(base64)}, nil)
 	if err != nil {
 		return err
 	}
