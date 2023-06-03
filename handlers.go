@@ -148,7 +148,10 @@ func ViewHandler(rt *Rtorrent) http.HandlerFunc {
 			"d.size_bytes=", "d.completed_bytes=", "d.up.rate=",
 			"d.up.total=", "d.down.rate=", "d.down.total=",
 			"d.message=", "d.is_active=", "d.is_open=",
-			"d.state=", "d.state_changed=", "d.state_counter="}
+			"d.is_hash_checking=", "d.peers_accounted=", "d.peers_complete=",
+			"d.state=", "d.state_changed=", "d.state_counter=", "d.priority=",
+			"d.custom1=", "d.custom2=", "d.custom3=",
+			"d.custom4=", "d.custom5="}
 
 		torrents, err := rt.DMulticall("main", args)
 		if err != nil {
