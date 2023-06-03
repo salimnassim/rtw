@@ -32,3 +32,4 @@ List all unregistered torrents
 - `BASIC_PASSWORD`: rTorrent XML-RPC basic auth password (optional)
 - `CORS_ORIGIN`: *
 - `CORS_AGE`: 86400
+- `PPROF`: register pprof routes
