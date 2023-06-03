@@ -15,7 +15,7 @@ func main() {
 
 	transport := &http.Transport{}
 
-	// enable pprof if env is set
+	// enable basic auth if env is set
 	if os.Getenv("BASIC_USERNAME") != "" && os.Getenv("BASIC_PASSWORD") != "" {
 		transport.RegisterProtocol("https",
 			newBasicAuthTransport(
