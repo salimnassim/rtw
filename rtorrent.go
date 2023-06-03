@@ -26,6 +26,7 @@ type Torrent struct {
 	State          int64  `xmlrpc:"d.state=" json:"state"`
 	StateChanged   int64  `xmlrpc:"d.state_changed=" json:"state_changed"`
 	StateCounter   int64  `xmlrpc:"d.state_counter=" json:"state_counter"`
+	Priority       int64  `xmlrpc:"d.priority=" json:"priority"`
 	Custom1        string `xmlrpc:"d.custom1=" json:"custom1"`
 	Custom2        string `xmlrpc:"d.custom2=" json:"custom2"`
 	Custom3        string `xmlrpc:"d.custom3=" json:"custom3"`
