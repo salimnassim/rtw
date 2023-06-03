@@ -2,12 +2,15 @@
 
 Provides a JSON API for interacting with rTorrent over XML-RPC.
 
-The server exposes a simple index on the `/` route.
+The server exposes a simple main view index on the `/` route.
 
 ## API routes
 
 `GET /api/methods`
-Retrieves all system methods from rTorrent.
+Retrieves all system methods.
+
+`GET /api/system`
+Retrieves throttle limits and system information.
 
 `GET /api/view/{view}`
 Retrieves all torrents in the view.
@@ -22,7 +25,7 @@ Action can be: `stop`, `start`, `files`, `peers`, `trackers`
 
 List all unregistered torrents
 
-`curl 127.0.0.1:8080/api/view/main | jq -r '.torrents[] | select(.message | ascii_downcase | contains("unregistered torrent")) | .hash'`
+```curl 127.0.0.1:8080/api/view/main | jq -r '.torrents[] | select(.message | ascii_downcase | contains("unregistered torrent")) | .hash'```
 
 ## Environment variables
 
