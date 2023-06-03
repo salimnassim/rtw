@@ -24,7 +24,7 @@ List all unregistered torrents
 
 `curl 127.0.0.1:8080/api/view/main | jq -r '.torrents[] | select(.message | ascii_downcase | contains("unregistered torrent")) | .hash'`
 
-### Environment variables
+## Environment variables
 
 - `BIND_ADDRESS`: server IP:port (e.g. 0.0.0.0:8080)
 - `URL`: rTorrent XML-RPC endpoint (e.g. https://hostname/rpc2)

@@ -16,6 +16,11 @@ type Response struct {
 	Message string `json:"message"`
 }
 
+type SystemResponse struct {
+	Status string `json:"status"`
+	System System `json:"system"`
+}
+
 type MethodsResponse struct {
 	Status  string   `json:"status"`
 	Methods []string `json:"methods"`
@@ -77,6 +82,77 @@ func HelloHandler(rt *Rtorrent) http.HandlerFunc {
 		respond(Response{
 			Status:  "ok",
 			Message: "🐢",
+		}, http.StatusOK, w)
+	}
+}
+
+func SystemHandler(rt *Rtorrent) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		args := []interface{}{
+			[]interface{}{
+				SystemCall{
+					MethodName: "system.hostname",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "system.pid",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "system.time_seconds",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "system.api_version",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "system.client_version",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "system.library_version",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "throttle.global_down.total",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "throttle.global_up.total",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "throttle.global_down.rate",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "throttle.global_up.rate",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "throttle.global_down.max_rate",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "throttle.global_up.max_rate",
+					Params:     []string{""},
+				},
+			},
+		}
+
+		result, err := rt.SystemMulticall(args)
+		if err != nil {
+			respond(Response{
+				Status:  "error",
+				Message: err.Error(),
+			}, http.StatusInternalServerError, w)
+			return
+		}
+		respond(SystemResponse{
+			Status: "ok",
+			System: result,
 		}, http.StatusOK, w)
 	}
 }
