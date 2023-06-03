@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/base64"
-	"fmt"
 	"net/http"
 	"reflect"
 
@@ -82,6 +81,17 @@ type System struct {
 	APIVersion     string `rtw:"system.api_version" json:"api_version"`
 	ClientVersion  string `rtw:"system.client_version" json:"client_version"`
 	LibraryVersion string `rtw:"system.library_version" json:"library_version"`
+
+	Hostname string `rtw:"system.hostname" json:"hostname"`
+	PID      int64  `rtw:"system.pid" json:"pid"`
+	Time     int64  `rtw:"system.time_seconds" json:"time_seconds"`
+
+	ThrottleGlobalDownTotal   int64 `rtw:"throttle.global_down.total" json:"throttle_global_down_total"`
+	ThrottleGlobalUpTotal     int64 `rtw:"throttle.global_up.total" json:"throttle_global_up_total"`
+	ThrottleGlobalDownRate    int64 `rtw:"throttle.global_down.rate" json:"throttle_global_down_rate"`
+	ThrottleGlobalUpRate      int64 `rtw:"throttle.global_up.rate" json:"throttle_global_up_rate"`
+	ThrottleGlobalDownMaxRate int64 `rtw:"throttle.global_down.max_rate" json:"throttle_global_down_max_rate"`
+	ThrottleGlobalUpMaxRate   int64 `rtw:"throttle.global_up.max_rate" json:"throttle_global_up_max_rate"`
 }
 
 type SystemCall struct {
@@ -234,9 +244,27 @@ func multicallTags[T File | Torrent | Peer | Tracker](result interface{}, args i
 func systemTags(result interface{}, args interface{}) System {
 	system := &System{}
 
-	// todo: do work
+	// todo: use proper typing
 
-	fmt.Printf("%v %v", result, args)
+	r := result.([]interface{})
+	a := args.([]interface{})
+
+	for idx := 0; idx < len(r); idx++ {
+		ref := r[idx].([]interface{})[0]
+		fname := a[0].([]interface{})[idx].(SystemCall).MethodName
+
+		vo := reflect.ValueOf(system)
+		el := vo.Elem()
+		for i := 0; i < el.NumField(); i++ {
+			field := el.Type().Field(i)
+			if fname == field.Tag.Get("rtw") {
+				if ref == nil {
+					continue
+				}
+				el.Field(i).Set(reflect.ValueOf(ref))
+			}
+		}
+	}
 
 	return *system
 }

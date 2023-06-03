@@ -92,11 +92,51 @@ func SystemHandler(rt *Rtorrent) http.HandlerFunc {
 		args := []interface{}{
 			[]interface{}{
 				SystemCall{
+					MethodName: "system.hostname",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "system.pid",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "system.time_seconds",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "system.api_version",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "system.client_version",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "system.library_version",
+					Params:     []string{""},
+				},
+				SystemCall{
 					MethodName: "throttle.global_down.total",
 					Params:     []string{""},
 				},
 				SystemCall{
 					MethodName: "throttle.global_up.total",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "throttle.global_down.rate",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "throttle.global_up.rate",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "throttle.global_down.max_rate",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "throttle.global_up.max_rate",
 					Params:     []string{""},
 				},
 			},
