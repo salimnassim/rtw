@@ -3,7 +3,7 @@ WORKDIR /app
 COPY go.* ./
 RUN go mod download
 COPY . ./
-RUN go build -v -o server
+RUN CGO_ENABLED=0 GOOS=linux go build -v -o server
 
 FROM debian:stable-slim
 RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
