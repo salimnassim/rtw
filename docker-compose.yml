@@ -1,11 +1,13 @@
 services:
-   backend:
-     build: .
-     image: salimnassim/rtw:latest
-     environment:
+  backend:
+    build: .
+    image: salimnassim/rtw:latest
+    environment:
       BIND_ADDRESS: 127.0.0.1:8080
       URL: https://rtorrent/rpc
       BASIC_USERNAME: username
       BASIC_PASSWORD: password
       CORS_ORIGIN: "*"
       CORS_AGE: 86400
+    ports:
+    - "8080:8080"
