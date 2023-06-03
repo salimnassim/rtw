@@ -16,6 +16,11 @@ type Response struct {
 	Message string `json:"message"`
 }
 
+type SystemResponse struct {
+	Status string `json:"status"`
+	System System `json:"system"`
+}
+
 type MethodsResponse struct {
 	Status  string   `json:"status"`
 	Methods []string `json:"methods"`
@@ -77,6 +82,37 @@ func HelloHandler(rt *Rtorrent) http.HandlerFunc {
 		respond(Response{
 			Status:  "ok",
 			Message: "🐢",
+		}, http.StatusOK, w)
+	}
+}
+
+func SystemHandler(rt *Rtorrent) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		args := []interface{}{
+			[]interface{}{
+				SystemCall{
+					MethodName: "throttle.global_down.total",
+					Params:     []string{""},
+				},
+				SystemCall{
+					MethodName: "throttle.global_up.total",
+					Params:     []string{""},
+				},
+			},
+		}
+
+		result, err := rt.SystemMulticall(args)
+		if err != nil {
+			respond(Response{
+				Status:  "error",
+				Message: err.Error(),
+			}, http.StatusInternalServerError, w)
+			return
+		}
+		respond(SystemResponse{
+			Status: "ok",
+			System: result,
 		}, http.StatusOK, w)
 	}
 }
