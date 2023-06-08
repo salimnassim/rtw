@@ -3,10 +3,12 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"io"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -219,6 +221,7 @@ func ViewHandler(rt *Rtorrent) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 
+		// default calls
 		args := []interface{}{"", vars["view"],
 			"d.hash=", "d.name=",
 			"d.size_bytes=", "d.completed_bytes=", "d.up.rate=",
@@ -229,6 +232,33 @@ func ViewHandler(rt *Rtorrent) http.HandlerFunc {
 			"d.custom1=", "d.custom2=", "d.custom3=",
 			"d.custom4=", "d.custom5="}
 
+		// custom call from query string
+		qs := r.URL.Query().Get("args")
+		if qs != "" {
+
+			// split by comma
+			pieces := strings.Split(qs, ",")
+
+			// check that there are commands
+			if len(pieces) < 1 {
+				log.Printf("not enough pieces to make view handler request: %s", qs)
+				respond(Response{
+					Status:  "error",
+					Message: "not enough pieces in query string to make request",
+				}, http.StatusBadRequest, w)
+				return
+			}
+
+			// build view
+			args = []interface{}{"", vars["view"]}
+
+			// append pieces to args
+			for _, piece := range pieces {
+				args = append(args, fmt.Sprintf("%s=", piece))
+			}
+		}
+
+		// do request
 		torrents, err := rt.DMulticall("main", args)
 		if err != nil {
 			log.Printf("error in view handler: %s", err)
