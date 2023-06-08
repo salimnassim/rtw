@@ -10,28 +10,28 @@ import (
 
 type Torrent struct {
 	Hash           string `rtw:"d.hash=" json:"hash"`
-	Name           string `rtw:"d.name=" json:"name,omitempty"`
-	SizeBytes      int64  `rtw:"d.size_bytes=" json:"size_bytes,omitempty"`
-	CompletedBytes int64  `rtw:"d.completed_bytes=" json:"completed_bytes,omitempty"`
-	UploadRate     int64  `rtw:"d.up.rate=" json:"upload_rate,omitempty"`
-	UploadTotal    int64  `rtw:"d.up.total=" json:"upload_total,omitempty"`
-	DownloadRate   int64  `rtw:"d.down.rate=" json:"download_rate,omitempty"`
-	DownloadTotal  int64  `rtw:"d.down.total=" json:"download_total,omitempty"`
-	Message        string `rtw:"d.message=" json:"message,omitempty"`
-	IsActive       int64  `rtw:"d.is_active=" json:"is_active,omitempty"`
-	IsOpen         int64  `rtw:"d.is_open=" json:"is_open,omitempty"`
-	IsHashing      int64  `rtw:"d.is_hash_checking=" json:"is_hashing,omitempty"`
-	Leechers       int64  `rtw:"d.peers_accounted=" json:"leechers,omitempty"`
-	Seeders        int64  `rtw:"d.peers_complete=" json:"seeders,omitempty"`
-	State          int64  `rtw:"d.state=" json:"state,omitempty"`
-	StateChanged   int64  `rtw:"d.state_changed=" json:"state_changed,omitempty"`
-	StateCounter   int64  `rtw:"d.state_counter=" json:"state_counter,omitempty"`
-	Priority       int64  `rtw:"d.priority=" json:"priority,omitempty"`
-	Custom1        string `rtw:"d.custom1=" json:"custom1,omitempty"`
-	Custom2        string `rtw:"d.custom2=" json:"custom2,omitempty"`
-	Custom3        string `rtw:"d.custom3=" json:"custom3,omitempty"`
-	Custom4        string `rtw:"d.custom4=" json:"custom4,omitempty"`
-	Custom5        string `rtw:"d.custom5=" json:"custom5,omitempty"`
+	Name           string `rtw:"d.name=" json:"name"`
+	SizeBytes      int64  `rtw:"d.size_bytes=" json:"size_bytes"`
+	CompletedBytes int64  `rtw:"d.completed_bytes=" json:"completed_bytes"`
+	UploadRate     int64  `rtw:"d.up.rate=" json:"upload_rate"`
+	UploadTotal    int64  `rtw:"d.up.total=" json:"upload_total"`
+	DownloadRate   int64  `rtw:"d.down.rate=" json:"download_rate"`
+	DownloadTotal  int64  `rtw:"d.down.total=" json:"download_total"`
+	Message        string `rtw:"d.message=" json:"message"`
+	IsActive       int64  `rtw:"d.is_active=" json:"is_active"`
+	IsOpen         int64  `rtw:"d.is_open=" json:"is_open"`
+	IsHashing      int64  `rtw:"d.is_hash_checking=" json:"is_hashing"`
+	Leechers       int64  `rtw:"d.peers_accounted=" json:"leechers"`
+	Seeders        int64  `rtw:"d.peers_complete=" json:"seeders"`
+	State          int64  `rtw:"d.state=" json:"state"`
+	StateChanged   int64  `rtw:"d.state_changed=" json:"state_changed"`
+	StateCounter   int64  `rtw:"d.state_counter=" json:"state_counter"`
+	Priority       int64  `rtw:"d.priority=" json:"priority"`
+	Custom1        string `rtw:"d.custom1=" json:"custom1"`
+	Custom2        string `rtw:"d.custom2=" json:"custom2"`
+	Custom3        string `rtw:"d.custom3=" json:"custom3"`
+	Custom4        string `rtw:"d.custom4=" json:"custom4"`
+	Custom5        string `rtw:"d.custom5=" json:"custom5"`
 }
 
 type File struct {
