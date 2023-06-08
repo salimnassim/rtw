@@ -9,14 +9,28 @@ The server exposes a simple main view index on the `/` route.
 `GET /api/methods`
 Retrieves all system methods.
 
+---
+
 `GET /api/system`
 Retrieves throttle limits and system information.
+
+---
 
 `GET /api/view/{view}`
 Retrieves all torrents in the view.
 
+It is possible to retrieve specific fields from the server using `?args` query string followed by the field names. 
+
+```curl 127.0.0.1:8080/api/view/main?args=d.name,d.hash,d.size_bytes,d.message```
+
+This can be useful for managing the request size with larger instances. The fields have to be declared in the `Torrent` struct in `rtorrent.go`. If a struct field does not exist, it will be ignored.
+
+---
+
 `POST /api/load`
 Uploads torrent metadata file (.torrent) as a multipart file upload. The form key should be `file`.
+
+---
 
 `GET /api/torrent/{info_hash}/{action}`
 Action can be: `stop`, `start`, `files`, `peers`, `trackers`
